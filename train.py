@@ -1,4 +1,4 @@
-import gfootball.envas football_env
+import gfootball.envas as football_env
 env = football_env.create_environment(env_name = 'academy_empty_goal_close', stacked = False, logdir = '/tmp/football', write_goal_dumps = False, write_full_episode_dumps = False, render = False)
 env.reset()
 steps = 0
