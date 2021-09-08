@@ -92,7 +92,7 @@ def learner(center_model, queue, signal_queue, summary_queue, arg_dict):
     print("Learner process started")
     imported_model = importlib.import_module("models." + arg_dict["model"])
     imported_algo = importlib.import_module("algos." + arg_dict["algorithm"])
-    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+    device = torch.device("cuda:3" if torch.cuda.is_available() else "cpu")
     model = imported_model.Model(arg_dict, device)
     model.load_state_dict(center_model.state_dict())
     model.optimizer.load_state_dict(center_model.optimizer.state_dict())

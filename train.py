@@ -104,7 +104,7 @@ if __name__ == '__main__':
         "env": "11_vs_11_kaggle",
         # "11_vs_11_kaggle" : environment used for self-play training
         # "11_vs_11_stochastic" : environment used for training against fixed opponent(rule-based AI)
-        "num_processes": 30,  # should be less than the number of cpu cores in your workstation.
+        "num_processes": 28,  # should be less than the number of cpu cores in your workstation.
         "batch_size": 32,
         "buffer_size": 6,
         "rollout_len": 30,
@@ -121,8 +121,8 @@ if __name__ == '__main__':
         "summary_game_window" : 10,
         "model_save_interval" : 300000,  # number of gradient updates bewteen saving model
 
-        "trained_model_path" : None, # use when you want to continue traning from given model.
-        "latest_ratio" : 0.5, # works only for self_play training. 
+        "trained_model_path" : None, # use when you want to continue training from given model.
+        "latest_ratio" : 0.5, # works only for self_play training.
         "latest_n_model" : 10, # works only for self_play training.
         "print_mode" : False,
 
