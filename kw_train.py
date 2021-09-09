@@ -19,16 +19,16 @@ def main(arg_dict):
     np.set_printoptions(precision = 3)
     np.set_printoptions(suppress = True)
     pp = pprint.PrettyPrinter(indent = 4)
-    torch.set_num_threads(1)
-
-    fe = importlib.import_module("encoders." + arg_dict["encoder"])
+    torch.set_num_threads(1)#???
+    #
+    fe = importlib.import_module('encoders.' + arg_dict['encoder'])
     fe = fe.FeatureEncoder()
-    arg_dict["feature_dims"] = fe.get_feature_dims()
-
-    model = importlib.import_module("models." + arg_dict["model"])
+    arg_dict['feature_dims'] = fe.get_feature_dims()
+    #
+    model = importlib.import_module('models.' + arg_dict['model'])
     cpu_device = torch.device('cpu')
     center_model = model.Model(arg_dict)
-
+    #
     if arg_dict["trained_model_path"]:
         checkpoint = torch.load(arg_dict["trained_model_path"], map_location=cpu_device)
         optimization_step = checkpoint['optimization_step']
@@ -81,6 +81,8 @@ if __name__ == '__main__':
         # '11_vs_11_stochastic' : environment used for training against fixed opponent(rule-based AI)
         'env_evaluation': '11_vs_11_hard_stochastic',  # for evaluation of self-play trained agent (like validation set in Supervised Learning)
         #
+        'encoder': 'encoder_basic',
+        'rewarder': 'rewarder_basic',
         'model': 'conv1d',
         'algorithm': 'ppo'
     }
