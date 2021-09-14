@@ -12,7 +12,7 @@ def save_args(arg_dict):
 
 ################################################################################
 def main(arg_dict):
-    os.environ['OPENBLAS_NUM_THREADS'] = '1'#???
+    os.environ['OPENBLAS_NUM_THREADS'] = '1'    #???
     cur_time = datetime.now()
     arg_dict['log_dir'] = 'logs/' + cur_time.strftime('[%m-%d]%H.%M.%S')
     save_args(arg_dict)
@@ -20,14 +20,14 @@ def main(arg_dict):
     np.set_printoptions(precision = 3)
     np.set_printoptions(suppress = True)
     pp = pprint.PrettyPrinter(indent = 4)
-    torch.set_num_threads(1)#???
+    torch.set_num_threads(1)    #???
     #
     fe = importlib.import_module('encoders.' + arg_dict['encoder'])
     fe = fe.FeatureEncoder()
     arg_dict['feature_dims'] = fe.get_feature_dims()
     #
     model = importlib.import_module('models.' + arg_dict['model'])
-    cpu_device = torch.device('cpu')# gpu
+    cpu_device = torch.device('cpu')    # gpu
     center_model = model.Model(arg_dict)
     #
     if arg_dict['trained_model_path']:
