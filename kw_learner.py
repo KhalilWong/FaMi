@@ -8,8 +8,8 @@ import torch.optim as optim
 from torch.distributions import Categorical
 import torch.multiprocessing as mp
 from tensorboardX import SummaryWriter
-
-def write_summary(writer, arg_dict, summary_queue, n_game, loss_lst, pi_loss_lst, v_loss_lst, \
+################################################################################
+def write_summary(writer, arg_dict, summary_queue, n_game, loss_lst, pi_loss_lst, v_loss_lst,\
                   entropy_lst, move_entropy_lst, optimization_step, self_play_board, win_evaluation, score_evaluation):
     win, score, tot_reward, game_len = [], [], [], []
     loop_t, forward_t, wait_t = [], [], []
@@ -63,6 +63,7 @@ def write_summary(writer, arg_dict, summary_queue, n_game, loss_lst, pi_loss_lst
 
     return win_evaluation, score_evaluation
 
+################################################################################
 def save_model(model, arg_dict, optimization_step, last_saved_step):
     if optimization_step >= last_saved_step + arg_dict["model_save_interval"]:
         model_dict = {
@@ -77,6 +78,7 @@ def save_model(model, arg_dict, optimization_step, last_saved_step):
     else:
         return last_saved_step
 
+################################################################################
 def get_data(queue, arg_dict, model):
     data = []
     for i in range(arg_dict["buffer_size"]):
@@ -88,26 +90,27 @@ def get_data(queue, arg_dict, model):
         data.append(mini_batch)
     return data
 
+################################################################################
 def learner(center_model, queue, signal_queue, summary_queue, arg_dict):
-    print("Learner process started")
-    imported_model = importlib.import_module("models." + arg_dict["model"])
-    imported_algo = importlib.import_module("algos." + arg_dict["algorithm"])
-    device = torch.device("cuda:3" if torch.cuda.is_available() else "cpu")
+    print('Learner process started')
+    imported_model = importlib.import_module('models.' + arg_dict['model'])
+    imported_algo = importlib.import_module('algos.' + arg_dict['algorithm'])
+    device = torch.device('cuda:3' if torch.cuda.is_available() else 'cpu')
     model = imported_model.Model(arg_dict, device)
     model.load_state_dict(center_model.state_dict())
     model.optimizer.load_state_dict(center_model.optimizer.state_dict())
     algo = imported_algo.Algo(arg_dict)
-
+    #
     for state in model.optimizer.state.values():
         for k, v in state.items():
             if isinstance(v, torch.Tensor):
-                state[k] = v.cuda()
+                state[k] = v.cuda(device)   # ???
     model.to(device)
-
-    writer = SummaryWriter(logdir=arg_dict["log_dir"])
+    #
+    writer = SummaryWriter(logdir = arg_dict['log_dir'])
     optimization_step = 0
-    if "optimization_step" in arg_dict:
-        optimization_step = arg_dict["optimization_step"]
+    if 'optimization_step' in arg_dict:
+        optimization_step = arg_dict['optimization_step']
     last_saved_step = optimization_step
     n_game = 0
     loss_lst, pi_loss_lst, v_loss_lst, entropy_lst, move_entropy_lst = [], [], [], [], []

@@ -36,20 +36,20 @@ class Model(nn.Module):
         self.norm_right_closest = nn.LayerNorm(48)
         self.norm_cat = nn.LayerNorm(arg_dict['lstm_size'])
         #
-        self.lstm  = nn.LSTM(arg_dict["lstm_size"],arg_dict["lstm_size"])
+        self.lstm  = nn.LSTM(arg_dict['lstm_size'], arg_dict['lstm_size'])
         #
-        self.fc_pi_a1 = nn.Linear(arg_dict["lstm_size"], 164)
-        self.fc_pi_a2 = nn.Linear(164, 12)
+        self.fc_pi_a1 = nn.Linear(arg_dict['lstm_size'], 164)
         self.norm_pi_a1 = nn.LayerNorm(164)
+        self.fc_pi_a2 = nn.Linear(164, 12)  # 12的动作
 
-        self.fc_pi_m1 = nn.Linear(arg_dict["lstm_size"], 164)
-        self.fc_pi_m2 = nn.Linear(164, 8)
+        self.fc_pi_m1 = nn.Linear(arg_dict['lstm_size'], 164)
         self.norm_pi_m1 = nn.LayerNorm(164)
+        self.fc_pi_m2 = nn.Linear(164, 8)
 
-        self.fc_v1 = nn.Linear(arg_dict["lstm_size"], 164)
+        self.fc_v1 = nn.Linear(arg_dict['lstm_size'], 164)
         self.norm_v1 = nn.LayerNorm(164)
-        self.fc_v2 = nn.Linear(164, 1,  bias=False)
-        self.optimizer = optim.Adam(self.parameters(), lr=arg_dict["learning_rate"])
+        self.fc_v2 = nn.Linear(164, 1, bias = False)
+        self.optimizer = optim.Adam(self.parameters(), lr = arg_dict['learning_rate'])
 
     def forward(self, state_dict):
         player_state = state_dict['player']
@@ -82,21 +82,21 @@ class Model(nn.Module):
         cat = F.relu(self.norm_cat(self.fc_cat(cat)))
         h_in = state_dict['hidden']
         out, h_out = self.lstm(cat, h_in)
-
+        #
         a_out = F.relu(self.norm_pi_a1(self.fc_pi_a1(out)))
         a_out = self.fc_pi_a2(a_out)
-        logit = a_out + (avail-1)*1e7
-        prob = F.softmax(logit, dim=2)
-
+        logit = a_out + (avail - 1) * 1e7
+        prob = F.softmax(logit, dim = 2)
+        #
         prob_m = F.relu(self.norm_pi_m1(self.fc_pi_m1(out)))
         prob_m = self.fc_pi_m2(prob_m)
-        prob_m = F.softmax(prob_m, dim=2)
-
+        prob_m = F.softmax(prob_m, dim = 2)
+        #
         v = F.relu(self.norm_v1(self.fc_v1(out)))
         v = self.fc_v2(v)
-
+        #
         return prob, prob_m, v, h_out
-
+    #
     def make_batch(self, data):
         # data = [tr1, tr2, ..., tr10] * batch_size
         s_player_batch, s_ball_batch, s_left_batch, s_left_closest_batch, s_right_batch, s_right_closest_batch, avail_batch =  [],[],[],[],[],[],[]

@@ -3,6 +3,10 @@ import time, os
 import numpy as np
 import torch
 import torch.multiprocessing as mp
+#
+from actor import *
+from learner import *
+from evaluator import evaluator
 
 ################################################################################
 def save_args(arg_dict):
@@ -82,6 +86,18 @@ if __name__ == '__main__':
         # '11_vs_11_stochastic' : environment used for training against fixed opponent(rule-based AI)
         'env_evaluation': '11_vs_11_hard_stochastic',  # for evaluation of self-play trained agent (like validation set in Supervised Learning)
         'trained_model_path': None,
+        #
+        'batch_size': 32,
+        'buffer_size': 6,
+        'rollout_len': 30,
+        'lstm_size': 256,
+        #algo
+        'gamma': 0.993,
+        'lmbda': 0.96,
+        'k_epoch': 3,
+        'entropy_coef': 0.0001,
+        'grad_clip': 3.0,
+        'eps_clip': 0.1,
         #
         'encoder': 'encoder_basic',
         'rewarder': 'rewarder_basic',
