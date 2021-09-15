@@ -87,6 +87,8 @@ if __name__ == '__main__':
         'env_evaluation': '11_vs_11_hard_stochastic',  # for evaluation of self-play trained agent (like validation set in Supervised Learning)
         'trained_model_path': None,
         #
+        'summary_game_window': 10,
+        'model_save_interval': 300000,
         'batch_size': 32,
         'buffer_size': 6,
         'rollout_len': 30,

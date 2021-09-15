@@ -65,15 +65,15 @@ def write_summary(writer, arg_dict, summary_queue, n_game, loss_lst, pi_loss_lst
 
 ################################################################################
 def save_model(model, arg_dict, optimization_step, last_saved_step):
-    if optimization_step >= last_saved_step + arg_dict["model_save_interval"]:
+    if optimization_step >= last_saved_step + arg_dict['model_save_interval']:
         model_dict = {
             'optimization_step': optimization_step,
             'model_state_dict': model.state_dict(),
             'optimizer_state_dict': model.optimizer.state_dict(),
         }
-        path = arg_dict["log_dir"]+"/model_"+str(optimization_step)+".tar"
+        path = arg_dict['log_dir'] + '/model_' + str(optimization_step) + '.tar'
         torch.save(model_dict, path)
-        print("Model saved :", path)
+        print('Model saved :', path)
         return optimization_step
     else:
         return last_saved_step
@@ -81,9 +81,9 @@ def save_model(model, arg_dict, optimization_step, last_saved_step):
 ################################################################################
 def get_data(queue, arg_dict, model):
     data = []
-    for i in range(arg_dict["buffer_size"]):
+    for i in range(arg_dict['buffer_size']):
         mini_batch_np = []
-        for j in range(arg_dict["batch_size"]):
+        for j in range(arg_dict['batch_size']):
             rollout = queue.get()
             mini_batch_np.append(rollout)
         mini_batch = model.make_batch(mini_batch_np)
@@ -115,37 +115,34 @@ def learner(center_model, queue, signal_queue, summary_queue, arg_dict):
     n_game = 0
     loss_lst, pi_loss_lst, v_loss_lst, entropy_lst, move_entropy_lst = [], [], [], [], []
     self_play_board = {}
-
     win_evaluation, score_evaluation = [], []
-
+    #
     while True:
-        if queue.qsize() > arg_dict["batch_size"]*arg_dict["buffer_size"]:
+        if queue.qsize() > arg_dict['batch_size'] * arg_dict['buffer_size']:
             last_saved_step = save_model(model, arg_dict, optimization_step, last_saved_step)
-
+            #
             signal_queue.put(1)
             data = get_data(queue, arg_dict, model)
             loss, pi_loss, v_loss, entropy, move_entropy = algo.train(model, data)
-            optimization_step += arg_dict["batch_size"]*arg_dict["buffer_size"]*arg_dict["k_epoch"]
-            print("step :", optimization_step, "loss", loss, "data_q", queue.qsize(), "summary_q", summary_queue.qsize())
-
+            optimization_step += arg_dict['batch_size'] * arg_dict['buffer_size'] * arg_dict['k_epoch']
+            print('step :', optimization_step, 'loss', loss, 'data_q', queue.qsize(), 'summary_q', summary_queue.qsize())
+            #
             loss_lst.append(loss)
             pi_loss_lst.append(pi_loss)
             v_loss_lst.append(v_loss)
             entropy_lst.append(entropy)
             move_entropy_lst.append(move_entropy)
             center_model.load_state_dict(model.state_dict())
-
-            if queue.qsize() > arg_dict["batch_size"]*arg_dict["buffer_size"]:
-                print("warning. data remaining. queue size : ", queue.qsize())
-
-            if summary_queue.qsize() > arg_dict["summary_game_window"]:
+            #
+            if queue.qsize() > arg_dict['batch_size'] * arg_dict['buffer_size']:
+                print('warning. data remaining. queue size : ', queue.qsize())
+            if summary_queue.qsize() > arg_dict['summary_game_window']:
                 win_evaluation, score_evaluation = write_summary(writer, arg_dict, summary_queue, n_game, loss_lst, pi_loss_lst,
                                                                  v_loss_lst, entropy_lst, move_entropy_lst, optimization_step,
                                                                  self_play_board, win_evaluation, score_evaluation)
                 loss_lst, pi_loss_lst, v_loss_lst, entropy_lst, move_entropy_lst = [], [], [], [], []
-                n_game += arg_dict["summary_game_window"]
-
+                n_game += arg_dict['summary_game_window']
+            #
             _ = signal_queue.get()
-
         else:
             time.sleep(0.1)
