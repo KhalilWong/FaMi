@@ -171,11 +171,13 @@ def actor_self(actor_num, center_model, data_queue, signal_queue, summary_queue,
     model = imported_model.Model(arg_dict)
     model.load_state_dict(center_model.state_dict())
     opp_model = imported_model.Model(arg_dict)
-
-    env = football_env.create_environment(env_name=arg_dict["env"], number_of_right_players_agent_controls=1, representation="raw", \
-                                          stacked=False, logdir='/tmp/football', write_goal_dumps=False, write_full_episode_dumps=False, \
-                                          render=False)
-
+    #
+    env = football_env.create_environment(\
+                    env_name = arg_dict['env'], number_of_right_players_agent_controls = 1, representation = 'raw',\
+                    stacked = False, logdir = '/tmp/football', write_goal_dumps = False,\
+                    write_full_episode_dumps = False, render = False\
+                    )
+    #
     n_epi = 0
     rollout = []
     while True: # episode loop
