@@ -136,27 +136,28 @@ def actor(actor_num, center_model, data_queue, signal_queue, summary_queue, arg_
                 summary_data = (win, score, tot_reward, steps, 0, loop_t/steps, forward_t/steps, wait_t/steps)
                 summary_queue.put(summary_data)
 
+################################################################################
 def select_opponent(arg_dict):
-    onlyfiles_lst = [f for f in listdir(arg_dict["log_dir"]) if isfile(join(arg_dict["log_dir"], f))]
+    onlyfiles_lst = [f for f in listdir(arg_dict['log_dir']) if isfile(join(arg_dict['log_dir'], f))]
     model_num_lst = []
     for file_name in onlyfiles_lst:
-        if file_name[:6] == "model_":
+        if file_name[:6] == 'model_':
             model_num = file_name[6:]
             model_num = model_num[:-4]
             model_num_lst.append(int(model_num))
     model_num_lst.sort()
-
+    #
     coin = random.random()
-    if coin<arg_dict["latest_ratio"]:
-        if len(model_num_lst) > arg_dict["latest_n_model"]:
-            opp_model_num = random.randint(len(model_num_lst)-arg_dict["latest_n_model"],len(model_num_lst)-1)
+    if coin < arg_dict['latest_ratio']:
+        if len(model_num_lst) > arg_dict['latest_n_model']:
+            opp_model_num = random.randint(len(model_num_lst) - arg_dict['latest_n_model'], len(model_num_lst) - 1) # 最新均匀
         else:
-            opp_model_num = len(model_num_lst)-1
+            opp_model_num = len(model_num_lst) - 1
     else:
-        opp_model_num = random.randint(0,len(model_num_lst)-1)
-
-    model_name = "/model_"+str(model_num_lst[opp_model_num])+".tar"
-    opp_model_path = arg_dict["log_dir"] + model_name
+        opp_model_num = random.randint(0, len(model_num_lst) - 1)   # 均匀
+    #
+    model_name = '/model_' + str(model_num_lst[opp_model_num]) + '.tar'
+    opp_model_path = arg_dict['log_dir'] + model_name
     return opp_model_num, opp_model_path
 
 ################################################################################
@@ -182,7 +183,7 @@ def actor_self(actor_num, center_model, data_queue, signal_queue, summary_queue,
     rollout = []
     while True: # episode loop
         opp_model_num, opp_model_path = select_opponent(arg_dict)
-        checkpoint = torch.load(opp_model_path, map_location=cpu_device)
+        checkpoint = torch.load(opp_model_path, map_location = cpu_device)
         opp_model.load_state_dict(checkpoint['model_state_dict'])
         print("Current Opponent model Num:{}, Path:{} successfully loaded".format(opp_model_num, opp_model_path))
         del checkpoint
